@@ -45,12 +45,26 @@ const apply = async (req, res) => {
     try {
       if (!browser) {
         const puppeteer = require('puppeteer');
-        browser = await puppeteer.launch({ headless: 'shell', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        // Enhanced debugging: full browser, DevTools, browser logs, slow operations
+        browser = await puppeteer.launch({
+          headless: false,
+          devtools: true,
+          dumpio: true,
+          slowMo: 500, // Slow down by 500ms for visibility
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
       }
       const page = await browser.newPage();
 
+      // Add console logging from browser
+      page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
       // Navigate to Application Form
       await page.goto(applicationUrl, { waitUntil: 'networkidle2' });
+
+      // Capture screenshot of the page for debugging
+      await page.screenshot({ path: 'debug-page-screenshot.png', fullPage: true });
+      console.log('Screenshot saved as debug-page-screenshot.png');
 
       // Log available inputs for debugging
       console.log('Available input fields on page:');
