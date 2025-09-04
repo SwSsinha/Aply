@@ -14,7 +14,9 @@ async function parseResumeText(text) {
     });
 
     const aiResponse = response.data.candidates[0].content.parts[0].text;
-    const parsedData = JSON.parse(aiResponse);
+    // Remove markdown code blocks if present (e.g., ```json ... ```)
+    const jsonString = aiResponse.replace(/^```json\s*/, '').replace(/\s*```$/gm, '').trim();
+    const parsedData = JSON.parse(jsonString);
 
     return parsedData;
   } catch (error) {
