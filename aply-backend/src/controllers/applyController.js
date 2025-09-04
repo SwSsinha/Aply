@@ -52,18 +52,54 @@ const apply = async (req, res) => {
       // Navigate to Application Form
       await page.goto(applicationUrl, { waitUntil: 'networkidle2' });
 
+      // Log available inputs for debugging
+      console.log('Available input fields on page:');
+      const inputs = await page.$$('input');
+      for (let i = 0; i < inputs.length; i++) {
+        const attrs = await page.evaluate(el => ({
+          id: el.id,
+          name: el.name,
+          type: el.type,
+          placeholder: el.placeholder
+        }), inputs[i]);
+        console.log(`Input ${i}: id=${attrs.id}, name=${attrs.name}, type=${attrs.type}, placeholder=${attrs.placeholder}`);
+      }
+
+      console.log('Available buttons on page:');
+      const buttons = await page.$$('button, input[type="submit"]');
+      for (let i = 0; i < buttons.length; i++) {
+        const attrs = await page.evaluate(el => ({
+          id: el.id,
+          className: el.className,
+          textContent: el.textContent?.trim(),
+          type: el.type
+        }), buttons[i]);
+        console.log(`Button ${i}: id=${attrs.id}, class=${attrs.className}, text=${attrs.textContent}, type=${attrs.type}`);
+      }
+
       // Iterate Through Fields: Loop through an array of form field names (e.g., fullName, email, phone). Use await page.type('#fullName', 'John Doe'); to fill in data.
       const fields = [
         { selector: '#fullName', value: userData.name },
         { selector: '#email', value: userData.email },
         { selector: '#phone', value: userData.phone },
         { selector: '#address', value: userData.address },
+        { selector: 'input[name="name"]', value: userData.name }, // Fallback for name
+        { selector: 'input[type="email"]', value: userData.email }, // Fallback for email
+        { selector: 'input[name="phone"]', value: userData.phone }, // Fallback for phone
+        { selector: 'input[name*="address"]', value: userData.address }, // Fallback for address
       ];
 
       for (const field of fields) {
         try {
-          if (await page.$(field.selector)) {
-            await page.type(field.selector, field.value || '');
+          const element = await page.$(field.selector);
+          if (element) {
+            const isVisible = await page.evaluate(el => el.offsetParent !== null, element);
+            if (isVisible) {
+              await page.type(field.selector, field.value || '');
+              console.log(`Filled field ${field.selector} with ${field.value}`);
+            } else {
+              console.log(`Field ${field.selector} not visible`);
+            }
           } else {
             console.log(`Field ${field.selector} not found`);
           }
@@ -85,8 +121,72 @@ const apply = async (req, res) => {
         });
       }
 
-      // Form Submission: After all fields are filled, await page.click('button[type="submit"]');
-      await page.click('button[type="submit"]');
+      // Form Submission: After all fields are filled, attempt to click submit button
+      console.log('Attempting to find and click submit button...');
+      let submitClicked = false;
+      const submitSelectors = [
+        'button[type="submit"]',
+        'input[type="submit"]',
+        '.submit',
+        '[value="Submit"]',
+      ];
+
+      // Try XPath for text-containing buttons
+      const xpathSelectors = [
+        '//button[contains(text(), "Submit")]',
+        '//button[contains(text(), "Apply")]',
+        '//input[contains(@value, "Submit")]',
+        '//button[contains(text(), "Send")]', // Additional common text
+      ];
+
+      for (const selector of submitSelectors) {
+        try {
+          const element = await page.$(selector);
+          if (element) {
+            const isVisible = await page.evaluate(el => el.offsetParent !== null && el.disabled === false, element);
+            if (isVisible) {
+              await page.click(selector);
+              console.log(`Clicked submit button with selector: ${selector}`);
+              submitClicked = true;
+              break;
+            } else {
+              console.log(`Submit button with selector ${selector} not visible or disabled`);
+            }
+          } else {
+            console.log(`Submit selector ${selector} not found`);
+          }
+        } catch (error) {
+          console.error(`Error clicking submit with ${selector}:`, error);
+        }
+        if (submitClicked) break;
+      }
+
+      if (!submitClicked) {
+        for (const xpath of xpathSelectors) {
+          try {
+            const [element] = await page.$x(xpath);
+            if (element) {
+              const isVisible = await page.evaluate(el => el.offsetParent !== null && el.disabled === false, element);
+              if (isVisible) {
+                await element.click();
+                console.log(`Clicked submit button with XPath: ${xpath}`);
+                submitClicked = true;
+                break;
+              } else {
+                console.log(`Submit XPath ${xpath} not visible or disabled`);
+              }
+            } else {
+              console.log(`Submit XPath ${xpath} not found`);
+            }
+          } catch (error) {
+            console.error(`Error clicking submit with XPath ${xpath}:`, error);
+          }
+        }
+      }
+
+      if (!submitClicked) {
+        console.log('No submit button found or all attempts failed');
+      }
 
       // Wait for submission (optional)
       await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => {
