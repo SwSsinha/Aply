@@ -103,9 +103,6 @@ const apply = async (req, res) => {
         tailoredContent
       });
 
-      await browser.close(); // Close after use
-      browser = null; // Prevent double close
-
       // Success Response
       return res.status(200).json({
         message: 'Application submitted successfully!',
