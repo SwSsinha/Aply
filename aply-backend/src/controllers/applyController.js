@@ -45,7 +45,7 @@ const apply = async (req, res) => {
     try {
       if (!browser) {
         const puppeteer = require('puppeteer');
-        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        browser = await puppeteer.launch({ headless: 'shell', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
       }
       const page = await browser.newPage();
 
