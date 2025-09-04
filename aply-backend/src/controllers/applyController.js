@@ -20,8 +20,25 @@ const apply = async (req, res) => {
       return res.status(404).json({ message: 'User resume data not found' });
     }
 
+    // Navigation & Scraping
+    const page = await browser.newPage();
+    await page.goto(jobUrl, { waitUntil: 'networkidle2' });
+
+    // Scrape job info
+    const jobInfo = await page.evaluate(() => {
+      const title = document.querySelector('h1')?.textContent?.trim() || 'Not found';
+      const company = document.querySelector('.company')?.textContent?.trim() || document.querySelector('[id*="company"]')?.textContent?.trim() || 'Not found';
+      const description = document.querySelector('.job-description')?.textContent?.trim() || document.querySelector('[class*="description"]')?.textContent?.trim() || document.querySelector('[id*="description"]')?.textContent?.trim() || '';
+
+      return { title, company, description };
+    });
+
+    if (!jobInfo.description || jobInfo.title === 'Not found') {
+      return res.status(404).send('Job page structure not recognized.');
+    }
+
     // Placeholder for next steps
-    res.send('Puppeteer launched and user data retrieved');
+    res.send('Job page navigated and scraped: ' + JSON.stringify(jobInfo));
   } catch (error) {
     console.error('Error in apply:', error);
     res.status(500).json({ message: 'Internal server error' });
