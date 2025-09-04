@@ -1,0 +1,3 @@
+// TODO: This file customizes the Tailwind CSS configuration for the APLY frontend project.
+// It will specify content paths to scan for Tailwind classes (src directory with JS/JSX files), define custom themes, extend default utilities/colors/spacing, and add plugins as needed.
+// Tailwind will use this config to generate only the used CSS classes, keeping the bundle size small for optimal performance.

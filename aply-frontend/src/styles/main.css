@@ -1,0 +1,4 @@
+/* TODO: This file is for global CSS styles that are not managed by Tailwind CSS for the APLY frontend.
+It will contain custom CSS rules like keyframe animations for transitions (e.g., form loading spinner), custom font imports, or component-specific styles that can't be easily handled with utility classes.
+Import this CSS file in the main entry points (App.jsx or main.jsx) to apply globally across the application.
+Keep this file minimal, using Tailwind for most styling to maintain consistency. */

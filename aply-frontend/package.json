@@ -1,0 +1,3 @@
+{
+  "comment": "TODO: This file defines the APLY frontend project configuration, dependencies, and scripts. It will include project metadata (name, version, description), list of dependencies (React, Vite, Tailwind, Axios for API), devDependencies (Autoprefixer, ESLint), and scripts for development (dev: 'vite'), building (build: 'vite build'), and previewing. Configure the project as a standard React + Vite setup with TypeScript if planned, and ensure scripts handle the headless browsing configurations."
+}

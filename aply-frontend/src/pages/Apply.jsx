@@ -1,0 +1,3 @@
+// TODO: This file implements the Apply page, the main view for job application submission in APLY.
+// It will provide an input field for job posting URL, a submit button to initiate the application process via /api/apply endpoint, display real-time status updates (e.g., "Navigating to page", "Filling form", "Application submitted"), and conditionally render the ChatInterface for unique questions.
+// Handle API responses (200 success, 202 awaiting input), manage application history display, and include error handling with user-friendly messages.

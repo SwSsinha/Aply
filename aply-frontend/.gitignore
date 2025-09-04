@@ -1,0 +1,35 @@
+# TODO: This file specifies files and directories for Git to ignore during version control.
+# It will include standard ignores like node_modules, build outputs (dist), environment files (.env, .local), IDE folders (.vscode), OS files (Thumbs.db), logs, coverage reports, and other temporary or sensitive content.
+# Ensure secrets and large files are not committed, and keep the repo clean.
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
