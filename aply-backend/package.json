@@ -17,6 +17,8 @@
     "express": "^5.1.0",
     "express-fileupload": "^1.5.2",
     "firebase-admin": "^13.5.0",
+    "mammoth": "^1.10.0",
+    "pdf-parse": "^1.1.1",
     "puppeteer": "^24.19.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
