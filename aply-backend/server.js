@@ -30,4 +30,15 @@ firebaseAdmin.initializeApp({
 // Initialize Express app
 const app = express();
 
-// Placeholder for further setup (middleware, routes, DB connection)
+// Use Express middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Enable file uploads
+app.use(fileUpload());
+
+// Placeholder for routes (to be added later)
+
+// Set up your server to listen on a port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
