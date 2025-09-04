@@ -37,8 +37,17 @@ const apply = async (req, res) => {
       return res.status(404).send('Job page structure not recognized.');
     }
 
+    // LLM Calls for Customization
+    const { extractJobSkills, generateTailoredResume } = require('../utils/llm');
+
+    // Send job description to LLM to extract key skills and unique questions
+    const customizationData = await extractJobSkills(jobInfo.description);
+
+    // Send user data and job info to LLM to create tailored resume and cover letter
+    const tailoredContent = await generateTailoredResume(userData, jobInfo);
+
     // Placeholder for next steps
-    res.send('Job page navigated and scraped: ' + JSON.stringify(jobInfo));
+    res.send('LLM customization complete: ' + JSON.stringify({ customizationData, tailoredContent }));
   } catch (error) {
     console.error('Error in apply:', error);
     res.status(500).json({ message: 'Internal server error' });
