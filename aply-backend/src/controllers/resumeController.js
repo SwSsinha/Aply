@@ -3,6 +3,7 @@ const { parseResumeText } = require('../utils/llm');
 const { saveResumeData } = require('../utils/database');
 
 const upload = async (req, res) => {
+  console.log('Resume upload endpoint hit');
   // File Existence Check
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
@@ -17,7 +18,13 @@ const upload = async (req, res) => {
   if (!['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.mimetype)) {
     return res.status(400).send('Invalid file type. Only PDF and DOCX are supported.');
   }
-
+  
+  // Check GEMINI API key
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    return res.status(400).json({ message: 'Gemini API key not configured. Please set your actual API key in .env file' });
+  }
+  
   try {
     // Raw Text Extraction
     const rawText = await extractResumeText(file.data, file.mimetype);
