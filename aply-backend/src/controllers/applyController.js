@@ -74,6 +74,17 @@ const apply = async (req, res) => {
 
       console.log('Form automation completed on', applicationUrl);
 
+      // Unique Question Detection: Implement logic to check the page for keywords that indicate a unique question (e.g., "eligible to work," "security clearance").
+      const pageText = await page.evaluate(() => document.body.innerText);
+
+      if (pageText.includes('eligible to work') || pageText.includes('security clearance')) {
+        return res.status(202).json({
+          status: 'Awaiting User Input',
+          question: 'Are you eligible to work in the US?',
+          state: 'unique_question_detected'
+        });
+      }
+
       await browser.close(); // Close after use
       browser = null; // Prevent double close
     } catch (error) {
