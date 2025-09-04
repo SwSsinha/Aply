@@ -6,8 +6,30 @@ const apply = async (req, res) => {
     return res.status(400).send('Invalid or missing jobUrl');
   }
 
-  // Placeholder for next steps
-  res.send('URL validated');
+  let browser;
+  try {
+    // Puppeteer Launch
+    const puppeteer = require('puppeteer');
+    browser = await puppeteer.launch({ headless: true });
+
+    // Get User Data
+    const { getResumeData } = require('../utils/database');
+    const userId = 'test-user-id'; // TODO: Get from authentication
+    const userData = await getResumeData(userId);
+    if (!userData) {
+      return res.status(404).json({ message: 'User resume data not found' });
+    }
+
+    // Placeholder for next steps
+    res.send('Puppeteer launched and user data retrieved');
+  } catch (error) {
+    console.error('Error in apply:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
 };
 
 // Helper function for URL validation

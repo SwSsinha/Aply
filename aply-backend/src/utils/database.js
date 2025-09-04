@@ -15,8 +15,20 @@ async function saveResumeData(userId, resumeData) {
   }
 }
 
-// Placeholder functions for other DB operations (to be implemented later)
-async function getResumeData(userId) { return {}; }
+// Placeholder functions for other DB operations
+async function getResumeData(userId) {
+  try {
+    const docRef = db.collection('users').doc(userId).collection('resume-data').doc('latest');
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      return null;
+    }
+    return doc.data();
+  } catch (error) {
+    console.error('Error getting resume data from Firestore:', error);
+    throw new Error('Failed to retrieve resume data');
+  }
+}
 async function saveApplicationHistory(userId, application) { return {}; }
 
 module.exports = { saveResumeData, getResumeData, saveApplicationHistory };
