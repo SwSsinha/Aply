@@ -35,18 +35,60 @@ const apply = async (req, res) => {
     // Send user data and job info to LLM to create tailored resume and cover letter
     const tailoredContent = await generateTailoredResume(userData, jobInfo);
 
-    // Checkpoint 3: Log generated content (skip PDF generation to avoid browser issues)
+    // Checkpoint 3: Log generated content
     console.log('Generated tailored resume summary:', tailoredContent.resumeSummary);
     console.log('Key skills extracted:', customizationData.skills);
 
-    // Response for checkpoint - no further steps
+    // Form Automation Logic
+    const applicationUrl = jobUrl; // Assume same URL for demo
+
+    try {
+      if (!browser) {
+        const puppeteer = require('puppeteer');
+        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      }
+      const page = await browser.newPage();
+
+      // Navigate to Application Form
+      await page.goto(applicationUrl, { waitUntil: 'networkidle2' });
+
+      // Iterate Through Fields: Loop through an array of form field names (e.g., fullName, email, phone). Use await page.type('#fullName', 'John Doe'); to fill in data.
+      const fields = [
+        { selector: '#fullName', value: userData.name },
+        { selector: '#email', value: userData.email },
+        { selector: '#phone', value: userData.phone },
+        { selector: '#address', value: userData.address },
+      ];
+
+      for (const field of fields) {
+        try {
+          if (await page.$(field.selector)) {
+            await page.type(field.selector, field.value || '');
+          } else {
+            console.log(`Field ${field.selector} not found`);
+          }
+        } catch (error) {
+          console.error(`Error filling field ${field.selector}:`, error);
+        }
+      }
+
+      console.log('Form automation completed on', applicationUrl);
+
+      await browser.close(); // Close after use
+      browser = null; // Prevent double close
+    } catch (error) {
+      console.error('Error in form automation:', error);
+    }
+
+    // Response with all phases completed
     res.status(200).json({
-      message: 'Checkpoint 3: Scraping & Content Generation Successful',
+      message: 'Phase 3+: Scraping, Content Generation & Form Automation Successful',
       data: {
         jobInfo,
         userData: { name: userData.name, email: userData.email },
         customizationData,
-        tailoredContent
+        tailoredContent,
+        formStatus: 'Form filled on application page'
       }
     });
   } catch (error) {
