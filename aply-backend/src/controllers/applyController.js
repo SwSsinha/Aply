@@ -131,14 +131,6 @@ const apply = async (req, res) => {
         '[value="Submit"]',
       ];
 
-      // Try XPath for text-containing buttons
-      const xpathSelectors = [
-        '//button[contains(text(), "Submit")]',
-        '//button[contains(text(), "Apply")]',
-        '//input[contains(@value, "Submit")]',
-        '//button[contains(text(), "Send")]', // Additional common text
-      ];
-
       for (const selector of submitSelectors) {
         try {
           const element = await page.$(selector);
@@ -162,26 +154,7 @@ const apply = async (req, res) => {
       }
 
       if (!submitClicked) {
-        for (const xpath of xpathSelectors) {
-          try {
-            const [element] = await page.$x(xpath);
-            if (element) {
-              const isVisible = await page.evaluate(el => el.offsetParent !== null && el.disabled === false, element);
-              if (isVisible) {
-                await element.click();
-                console.log(`Clicked submit button with XPath: ${xpath}`);
-                submitClicked = true;
-                break;
-              } else {
-                console.log(`Submit XPath ${xpath} not visible or disabled`);
-              }
-            } else {
-              console.log(`Submit XPath ${xpath} not found`);
-            }
-          } catch (error) {
-            console.error(`Error clicking submit with XPath ${xpath}:`, error);
-          }
-        }
+        console.log('No standard submit button found on page - this may not be an application form page');
       }
 
       if (!submitClicked) {
