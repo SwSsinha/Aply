@@ -85,8 +85,38 @@ const apply = async (req, res) => {
         });
       }
 
+      // Form Submission: After all fields are filled, await page.click('button[type="submit"]');
+      await page.click('button[type="submit"]');
+
+      // Wait for submission (optional)
+      await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => {
+        console.log('Navigation after submit timed out or not occurred');
+      });
+
+      // Database Update: If successful, save the application history in Firestore.
+      const { saveApplicationHistory } = require('../utils/database');
+      const applicationResult = await saveApplicationHistory(userId, {
+        jobUrl: jobUrl,
+        applicationDate: new Date().toISOString(),
+        status: 'submitted',
+        jobInfo,
+        tailoredContent
+      });
+
       await browser.close(); // Close after use
       browser = null; // Prevent double close
+
+      // Success Response
+      return res.status(200).json({
+        message: 'Application submitted successfully!',
+        application: {
+          id: applicationResult.id,
+          jobUrl: jobUrl,
+          userId: userId,
+          status: 'submitted',
+          date: new Date().toISOString()
+        }
+      });
     } catch (error) {
       console.error('Error in form automation:', error);
     }
