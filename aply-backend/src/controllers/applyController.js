@@ -8,10 +8,6 @@ const apply = async (req, res) => {
 
   let browser;
   try {
-    // Puppeteer Launch
-    const puppeteer = require('puppeteer');
-    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-
     // Get User Data
     const { getResumeData } = require('../utils/database');
     const userId = 'test-user-id'; // TODO: Get from authentication
