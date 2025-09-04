@@ -37,8 +37,10 @@ try {
 
   // Enable file uploads
   app.use(fileUpload());
-
-  // Placeholder for routes (to be added later)
+  
+  // Mount API routes
+  const apiRouter = require('./src/routes/api');
+  app.use('/api', apiRouter);
 
   // Set up your server to listen on a port
   const PORT = process.env.PORT || 3000;
