@@ -1,3 +1,23 @@
-// Contain functions for entire job application workflow, from URL receipt to submission.
-// Functions: Validate URL, launch Puppeteer, scrape job data, call LLM for customization, fill form, handle unique questions, submit, save history.
-// Break into sub-functions for navigation, scraping, form-filling, etc.
+const apply = async (req, res) => {
+  const jobUrl = req.body.jobUrl;
+
+  // URL Validation
+  if (!jobUrl || !isValidUrl(jobUrl)) {
+    return res.status(400).send('Invalid or missing jobUrl');
+  }
+
+  // Placeholder for next steps
+  res.send('URL validated');
+};
+
+// Helper function for URL validation
+const isValidUrl = (string) => {
+  try {
+    new URL(string);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+module.exports = { apply };
